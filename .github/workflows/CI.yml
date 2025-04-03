@@ -1,0 +1,37 @@
+name: .NET CI
+
+on: [push,pull_request]
+
+jobs: 
+      build:
+      runs-on: windows-latest
+
+      stratergy:
+      matrix:
+            configuration: [Debug,Release]
+
+            steps:
+            -name: Checkout code
+             uses: actions/checkout@v4
+
+             -name: Setup .NET
+             uses: actions/setup-dotnet@v3
+             with:
+             dotnet-version:'9.0.x'
+
+             -name: Restore Dependencies
+             run: dotnet restore"ChatBotAmo.sln"
+
+             -name: Build Solution 
+             run: dotnet build"ChatBotAmo.sln" --configuration ${{matrix.configuration}} --no-restore
+
+             -name: Execute Unit Tests
+             run: dotnet test"ChatBotAmo.sln" --configuration ${{matrix.configuration}} --no-restore--verbrosity normal
+
+             -name: Upload Build Artifacts
+             uses: actions/upload-artifact@v4
+             with:
+             name: Build Output - ${{matrix.configuration}} 
+             path: bin/${{matix.configuration}}/
+
+            
